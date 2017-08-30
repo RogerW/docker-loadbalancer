@@ -1,0 +1,36 @@
+app:
+  image: tutum/hello-world:latest
+  environment:
+    SERVICE_NAME: app
+    SERVICE_TAGS: production
+    SERVICE_80_NAME: http
+    SERVICE_80_CHECK_HTTP: .
+    SERVICE_80_CHECK_INTERVAL: 15
+  ports:
+    - 80
+
+lb:
+  build: ./
+  links:
+    - consul
+  ports:
+    - 80:80
+
+consul:
+  command: -server -bootstrap -advertise 10.0.2.4
+  image: gliderlabs/consul-server
+  ports:
+    - 8300:8300
+    - 8400:8400
+    - 8500:8500
+    - 8600:53/udp
+#
+# Service Discovery - Registrator
+#
+registrator:
+  command: -ip=10.0.2.4 consul://consul:8500
+  image: gliderlabs/registrator:latest
+  links:
+    - consul
+  volumes:
+    - "/var/run/docker.sock:/tmp/docker.sock"

@@ -12,6 +12,8 @@ RUN unzip consul-template.zip
 RUN chmod a+x consul-template
 RUN mv consul-template /usr/bin/consul-template
 
+EXPOSE 80
+
 ADD nginx.service /etc/service/nginx/run
 ADD consul-template.service /etc/service/consul-template/run
 
